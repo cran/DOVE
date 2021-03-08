@@ -1,0 +1,38 @@
+DOVE v1.5 (Release date: 2021-03-05)
+==============
+
+Changes:
+
+* Added undoing of option changes made in dove and vignette
+
+DOVE v1.4 (Release date: 2021-03-03)
+==============
+
+Changes:
+
+* Changed bw to bandwidth
+* Modified documentation
+
+DOVE v1.3 (Release date: 2021-03-02)
+==============
+
+Changes:
+
+* Add interval feature
+* Changed to allow specification of smoother bandwidth
+
+DOVE v1.2 (Release date: 2021-02-06)
+==============
+
+Changes:
+
+* Modified documentation
+
+DOVE v1.1 (Release date: 2021-02-04)
+==============
+
+Changes:
+
+* Changed example dataset
+* Changed smoothing of relative risk
+
