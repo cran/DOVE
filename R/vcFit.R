@@ -92,7 +92,7 @@
   # vaccinated
   vac <- D == 1L
 
-  # totoal number of participants vaccinated
+  # total number of participants vaccinated
   nVac <- sum(vac)
 
   # {nVac}
@@ -125,7 +125,7 @@
   Y2S <- outer(X = S[vac], Y = eventTimesAfterVac, FUN = "+")
 
   # identify the evenTimesVac bin in which Y2S falls
-  loc <- matrix(data = 0L, nVac, nEventsVac)
+  loc <- matrix(data = 0L, nrow = nVac, ncol = nEventsVac)
 
   for (k in 1L:m) {
     loc <- loc + k*{Y2S > timesLower[k]} * {Y2S <= timesUpper[k]}
@@ -137,7 +137,7 @@
   # in which the response falls
   # taken only for individuals that were vaccinated and experienced symptoms
   # {nEventsVac x {np+m}}
-  ind <- vac & Delta == 1L
+  ind <- vac & {Delta == 1L}
 
   ZBBy2 <- cbind(X[ind,,drop=FALSE], 
                  outer(X = Y[ind], Y = timesLower, FUN = ">")*
@@ -215,13 +215,13 @@
     uuu <- list()
     k <- 1L
     while (k <= np) {
-      uuu[[ k ]] <- colSums(iexb*X[vac,k])
+      uuu[[ k ]] <- colSums(x = iexb*X[vac,k])
       k <- k + 1L
     }
 
     # {nEventsVac x m}
     ttt <- sapply(X = {np+1L}:{np+m},
-                  FUN = function(x,y,z){colSums(y*{z==x})},
+                  FUN = function(x,y,z){colSums(x = y*{z==x})},
                   y = iexb, z = loc)
 
     k <- 1L
@@ -283,8 +283,14 @@
       }
     }
 
-    newbeta <- oldbeta - solve(a = dscore1 + dscore2, 
-                               b = colSums(x = score1) + colSums(x = score2))
+    inv <- tryCatch(expr = solve(a = dscore1 + dscore2, 
+                                 b = colSums(x = score1) + colSums(x = score2)),
+                    error = function(e) {
+                              message("unable to invert information matrix")
+                              stop(e$message, call. = FALSE)
+                             })
+
+    newbeta <- oldbeta - inv
 
     error <- sum(abs(x = newbeta-oldbeta))
     iter <- iter + 1L
@@ -322,7 +328,14 @@
   # {n x {np+m}}
   infbeta <- score1
   infbeta[vac,] <- infbeta[vac,] + inf2
-  infbeta <- -infbeta %*% solve(a = dscore1 + dscore2)
+
+  inv <- tryCatch(expr = solve(a = dscore1 + dscore2),
+                  error = function(e) {
+                            message("unable to invert information matrix")
+                            stop(e$message, call. = FALSE)
+                           })
+
+  infbeta <- -infbeta %*% inv
  
   # {np+m}
   betase <- sqrt(x = diag(x = crossprod(x = infbeta)))
@@ -340,7 +353,7 @@
   dd1 <- outer(X = diseaseTimeAfterVac, Y = testpt, FUN = "<=")
   dd2 <- outer(X = eventTimesAfterVac, Y = testpt, FUN = "<=")
 
-  VC <- colSums(DeltaVac*dd1/denom)
+  VC <- colSums(x = DeltaVac*dd1/denom)
 
   Vt <- VC
 
@@ -355,7 +368,7 @@
     # {np} each {nEventsVac}
     uuu <- apply(X = X[vac,,drop=FALSE], 
                  MARGIN = 2L,
-                 FUN = function(x,y) {colSums(y*x)},
+                 FUN = function(x,y) {colSums(x = y*x)},
                  y = iex)
     tmp2 <- tcrossprod(x = crossprod(x = tmp, y = uuu), y = infbeta[,1L:np])
   } else {

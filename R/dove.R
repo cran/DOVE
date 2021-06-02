@@ -139,15 +139,16 @@ dove <- function(formula, data, plots = TRUE, timePts = NULL, bandwidth = NULL) 
     stop("a data argument must be provided", call. = FALSE)
   }
 
-  # remove intercept from model if provided
-  if (attr(x = stats::terms(x = formula), which = "intercept") == 1L) {
-    formula = update.formula(old = formula, new = .~. -1)
-  }
-
   # reset options to allow for keeping na values
   opt <- options()
   options(na.action = 'na.pass')
   on.exit(options(opt))
+
+  # add intercept from model if not provided
+  # this was added 6/2/21 to ensure that factors are handled properly
+  if (attr(x = stats::terms(x = formula), which = "intercept") == 0L) {
+    formula = update.formula(old = formula, new = .~. +1)
+  }
 
   # try to obtain the model.frame
   mf <- tryCatch(expr = stats::model.frame(formula = formula, data = data),
@@ -158,6 +159,9 @@ dove <- function(formula, data, plots = TRUE, timePts = NULL, bandwidth = NULL) 
 
   # extract covariates
   X <- suppressMessages(stats::model.matrix(object = mf, data = data))
+  # 6/2/21 remove intercept
+  int <- attr(x = X, which = "assign") != 0L
+  X <- X[,int, drop = FALSE]
 
   # identify the columns that correspond to the returns returns by 
   # vaccine()
@@ -182,7 +186,9 @@ dove <- function(formula, data, plots = TRUE, timePts = NULL, bandwidth = NULL) 
   vacTime <- X[,i1]
   vacStatus <- X[,i2]
   entryTime <- X[,i3]
-  X <- X[,-c(which(i1),which(i2),which(i3))]
+  # 6/2/21 added drop=FALSE to properly handle case when only 1 covariate
+  # is in the model.
+  X <- X[,-c(which(i1),which(i2),which(i3)),drop = FALSE]
 
   if (ncol(x = X) == 0L) X <- NULL
   
@@ -214,7 +220,7 @@ dove <- function(formula, data, plots = TRUE, timePts = NULL, bandwidth = NULL) 
     entryTime <- entryTime[use]
     eventTime <- eventTime[use]
     eventStatus <- eventStatus[use]
-    if (!is.null(x = X)) X <- X[use,]
+    if (!is.null(x = X)) X <- X[use,, drop = FALSE]
     vacTime <- vacTime[use]
     vacStatus <- vacStatus[use]
   } 
@@ -228,7 +234,7 @@ dove <- function(formula, data, plots = TRUE, timePts = NULL, bandwidth = NULL) 
     entryTime <- entryTime[!tst]
     eventTime <- eventTime[!tst]
     eventStatus <- eventStatus[!tst]
-    if (!is.null(x = X)) X <- X[!tst,]
+    if (!is.null(x = X)) X <- X[!tst,, drop = FALSE]
     vacTime <- vacTime[!tst]
     vacStatus <- vacStatus[!tst]
   } 
@@ -262,7 +268,7 @@ dove <- function(formula, data, plots = TRUE, timePts = NULL, bandwidth = NULL) 
 
   if (is.null(x = timePts)) {
     timePts <- c(seq(from = 60L, to = tau, by = 60L), tau)
-    if (any(diff(timePts) < 60L)) {
+    if (any(diff(x = timePts) < 60L)) {
       nt <- length(x = timePts)
       timePts <- timePts[-nt]
     }

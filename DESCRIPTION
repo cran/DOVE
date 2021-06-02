@@ -1,8 +1,8 @@
 Package: DOVE
 Type: Package
 Title: Durability of Vaccine Efficacy
-Version: 1.5
-Date: 2021-03-05
+Version: 1.6
+Date: 2021-06-02
 Authors@R: c(person("Danyu", "Lin", role = "aut"),
              person("Donglin", "Zeng", role = "aut"),
              person("Shannon", "Holloway", role = c("aut", "cre"),
@@ -16,9 +16,9 @@ Encoding: UTF-8
 RoxygenNote: 7.1.1
 Collate: 'vcFit.R' 'vaccine.R' 'dove.R' 'doveData.R' 'plot.doveObj.R'
         'print.doveObj.R'
-Packaged: 2021-03-05 10:35:59 UTC; sthollow
+Packaged: 2021-06-02 17:20:12 UTC; sthollow
 Author: Danyu Lin [aut],
   Donglin Zeng [aut],
   Shannon Holloway [aut, cre]
 Maintainer: Shannon Holloway <sthollow@ncsu.edu>
-Date/Publication: 2021-03-08 08:30:11 UTC
+Date/Publication: 2021-06-02 18:20:07 UTC

@@ -1,3 +1,11 @@
+DOVE v1.6 (Release date: 2021-06-02)
+==============
+
+Changes:
+
+* Allowed for categorical covariates in model
+* Fixed bug when only 1 covariate provided in model
+
 DOVE v1.5 (Release date: 2021-03-05)
 ==============
 
