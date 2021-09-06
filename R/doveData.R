@@ -1,8 +1,8 @@
 #' Toy Dataset For Illustration
 #'
-#' This data set is provided for the purposes of illustrating the use of
+#' This data set is provided to illustrate the use of
 #' the software. It was simulated under a priority-tier dependent crossover 
-#' design.
+#' design with a ramping vaccine effect between dose 1 and dose 2.
 #' 
 #' 
 #' @usage data(doveData)
@@ -11,7 +11,7 @@
 #'   data.frame contains 7 columns, 
 #'   \describe{
 #'   \item{entry.time}{The entry time in days}
-#'   \item{event.time}{The event time in days}
+#'   \item{event.time}{The observation time in days}
 #'   \item{event.status}{The event indicator (1=event; 0=censored)}
 #'   \item{vaccine.time}{The time of vaccination in days; 
 #'                       NA if not vaccinated}

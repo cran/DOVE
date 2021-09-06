@@ -8,19 +8,31 @@ vaccine(entry_time, vaccination_status, vaccination_time)
 }
 \arguments{
 \item{entry_time}{The variable for the time when 
-the participant enters the trial.}
+the participant enters the trial. Entry times must be
+non-negative and complete.}
 
 \item{vaccination_status}{The variable indicating the vaccination 
-status: 1 = vaccinated; 0 = not vaccinated.}
+status: 1 = vaccinated; 0 = not vaccinated. Vaccination status
+must be binary, integer (or be able to be cast as integer without
+loss of information), and complete.}
 
 \item{vaccination_time}{The variable for the time when 
-vaccination takes place.}
+vaccination takes place. Vaccination time must be non-negative for
+vaccinated participants and can be
+any non-negative value, NA or Inf if a participant was not 
+vaccinated during the trial.}
 }
 \value{
-This function is intended to be used only in the model statement 
- of dove(). The result, a matrix, is used internally.
+This function is intended to be used only in the model statements 
+ of dove() and dove2(). The result, a matrix, is used internally.
 }
 \description{
-This function is used in the model statement of dove() to specify
+This function is used in the model statements of dove() and dove2() to specify
  the vaccination time, vaccination status, and entry time.
+}
+\details{
+For participants that were vaccinated, times must obey
+  entry_time \eqn{\le} vaccination_time. If a case is
+  found to violate this relationship, its entry_time is set to NA
+  and it is removed from the analysis.
 }

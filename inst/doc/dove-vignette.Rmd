@@ -1,0 +1,546 @@
+---
+title: "\\textbf{DOVE -- \\underline{D}urability \\underline{O}f \\underline{V}accine \\underline{E}fficacy}"
+date: August 31, 2021
+output: 
+  rmarkdown::pdf_document:
+    extra_dependencies: "subfig"
+vignette: >
+  %\VignetteIndexEntry{DOVE-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+opt <- options()
+options(continue="  ", width=70, prompt=" ")
+on.exit(options(opt))
+library(DOVE, quietly=TRUE)
+```
+
+
+\section{Introduction}
+
+DOVE is an R package for evaluating the durability of vaccine efficacy (VE) in a 
+randomized, placebo-controlled clinical trial with staggered enrollment of 
+participants and potential crossover of placebo recipients (Lin et al., 2021a; 2021b). 
+It inputs a rectangular dataset with the following information:
+
+\begin{itemize}
+\item \textbf{Entry time}: Calendar time when the participant enters the trial.
+
+\item \textbf{Event time}: Calendar time when the participant experiences the 
+clinical event of interest (e.g., symptomatic COVID-19) or their follow-up ends, 
+whichever occurs first.
+  
+\item \textbf{Event status}: Binary indicator taking the value 1 if the clinical 
+event of interest occurs before the end of follow-up and 0 otherwise.
+  
+\item \textbf{Vaccination status}: Binary indicator taking the value 1 if 
+vaccination occurs before the end of follow-up and 0 otherwise.
+  
+\item \textbf{Vaccination time}: Calendar time when vaccination takes place, 
+with an arbitrary non-negative value if the participant is not vaccinated.
+  
+\item \textbf{Covariates}: Baseline covariates (e.g., priority group, age, sex, 
+ethnicity). 
+\end{itemize}
+
+\noindent Of note, an arbitrary number of baseline covariates can be included, and
+all time variables are measured from the start of the trial and are 
+specified in units of days. 
+
+
+\vspace{.15in}
+
+The two primary analysis tools of the package are \textit{dove()} and \textit{dove2()}, the
+formal argument structures of which are similar and were chosen to resemble that of the 
+\textit{coxph()} function of the \textbf{survival} package. 
+The underlying methodologies for \textit{dove()} and \textit{dove2()} are 
+detailed in Lin et al. (2021a) and Lin et al. (2021b), respectively.
+Function \textit{dove()} 
+allows the vaccine effect to be an arbitrary function of time,
+whereas function \textit{dove2()} assumes that the 
+log hazard ratio for the vaccine effect is a piecewise linear function of time.
+Both functions return the estimated hazard ratio for each baseline covariate, the
+estimated VE in reducing the attack rate (cumulative incidence),
+the estimated VE in reducing the hazard rate (instantaneous risk), and the
+estimated VE in reducing the attack rate over successive time periods.
+
+We recommend \textit{dove()} for exploratory analyses and \textit{dove2()} for formal analyses.
+The latter yields more stable estimates, together with proper confidence intervals, for VE in 
+reducing the hazard rate.
+Both functions handle potentially right-censored events (e.g., symptomatic COVID-19,
+severe COVID-19, death).
+For interval-censored infection endpoints, iDOVE should be used instead.
+
+\vspace{.15in}
+
+The DOVE package includes convenience functions \textit{print()}, \textit{plot()}, and
+\textit{vaccine()}. Function \textit{vaccine()} is used to simplify the specification of 
+input variables required in the model statements of \textit{dove()} and \textit{dove2()}, similar in 
+spirit to the 
+\textit{cluster()} function of  the \textbf{survival} package. A simulated
+dataset is provided to illustrate the use of the software.
+
+\section{Functions}
+
+\subsection{\textit{vaccine()}}
+
+This convenience function is used as a component of the right-hand side
+of a formula object for the sole purpose of simplifying the specification
+of required input variables: entry time, vaccination status,
+and vaccination time. This function is not intended to be used as
+a stand-alone feature; although for completeness, the function ensures
+that the input data obey basic constraints and returns 
+the data in a predictable format for use in internal functions.
+
+\vspace{.15in}
+
+
+The usage is
+```{r eval=FALSE}
+vaccine(entry_time, vaccination_status, vaccination_time)
+```
+where \texttt{entry\_time} is the time when the participant enters the trial,
+\texttt{vaccination\_status} is the binary indicator of vaccination, and
+\texttt{vaccination\_time} is the time when vaccination takes place.
+
+\subsection{\textit{dove()}}
+
+This function estimates VE as a
+nonparametric function of time. The value object returned 
+contains the estimated hazard ratio for each baseline covariate,
+estimated VE in reducing the attack rate, $VE_a(t)$, and
+in reducing the hazard rate, $VE_h(t)$, where $t$ is the time elapsed since vaccination, 
+as well as the estimated VE in reducing the attack rate over $m$ successive 
+time periods, $VE_a(0,t_1), VE_a(t_1,t_2), \ldots, VE_a(t_{m-1},t_m)$. 
+By definition, $VE_a(0,t)=VE_a(t)$.
+
+\vspace{.15in}
+
+
+The function call takes the following form:
+
+```{r eval=FALSE}
+dove(formula, data, plots = TRUE, timePts = NULL, bandwidth = NULL)
+```
+where 
+\begin{itemize}
+\item \texttt{formula} is a model statement. See below for further details.
+\item \texttt{data} is the data.frame object containing all required data as 
+previously described.
+\item \texttt{plots} is a logical object indicating whether graphical forms of 
+the $VE_a(t)$ and $VE_h(t)$ results are to be generated. 
+\item \texttt{timePts} is an optional vector object specifying the time points 
+$(t_1, t_2, \ldots, t_m)$ for partitioning the study period. 
+\item \texttt{bandwidth} is an optional numeric object specifying the tuning 
+parameter for the bandwidth used in the kernel estimation of $VE_h(t)$. 
+\end{itemize}
+To obtain reliable estimates of $VE_a$ $(t_{j-1}, t_j)$ $(j=1,\ldots, m)$, 
+we suggest using broad time periods, such as every month,
+every two months, or every quarter.
+If \texttt{timePts} is not provided, the default time periods are every 60 days. 
+(If $\tau < 60$ days, timePts must be provided.) 
+We suggest choosing \texttt{bandwidth} between 0.1 and 1.0: a smaller bandwidth 
+yields a less biased
+estimate of $VE_h(t)$, whereas a larger bandwidth yields a smoother estimate of 
+the $VE_h$ curve.
+The default value of \texttt{bandwidth} is 0.3. This input is ignored if 
+\texttt{plots} is FALSE.
+
+\vspace{.15in}
+
+The model statement is a formula object. The left-hand side is a survival analysis
+object as returned by the \textit{Surv()} function of the \textbf{survival} 
+package and specifies
+the event time and event status. The right-hand side is a combination of
+baseline covariates and the previously described \textit{vaccine()} function. 
+Categorical baseline covariates can be specified, and if provided, 
+all other categories are compared to the first category.
+The \texttt{formula} input takes the following general structure
+
+```{r eval = FALSE}
+Surv(event_time, event_status) ~ covariates + 
+        vaccine(entry_time, vaccination_status, vaccination_time)
+```
+
+where 'event\_time', 'event\_status', 'covariates', 'entry\_time'
+'vaccination\_status' and 'vaccination\_time' are place holders
+indicating the data that are to be provided; they will be replaced by the variable names 
+in the header of the input data. 
+
+\vspace{.15in}
+
+The two VE measures, $VE_a(t)$ and $VE_h(t)$, are
+estimated up to the last observed event time.
+However, the estimates near the end of crossover where there are very few 
+placebo participants under follow-up may not be reliable.
+We also constrain $VE_h$ to be 0 at day 0 and non-decreasing at the right tail.
+For estimating $VE_a$ over successive time periods,
+the last time period should not extend beyond the point that there are still 
+a few placebo participants under follow-up.
+
+### \textit{dove2()}
+
+This function estimates VE under the assumption that the log hazard ratio for 
+the vaccine effect is a piecewise linear function of time. The value object 
+returned is similar to that returned by \textit{dove()} and contains the 
+estimated hazard ratio for each baseline covariate, 
+estimated VE in reducing the attack rate, $VE_a(t)$, and in reducing the 
+hazard rate, $VE_h(t)$, where $t$ is the
+time elapsed since vaccination, as well as the estimated VE in reducing the 
+attack rates over $m$ successive 
+time periods, $VE_a(0,t_1), VE_a(t_1,t_2), \ldots, VE_a(t_{m-1},t_m)$. 
+The 95\% confidence intervals for all three measures of VE are provided.
+
+\vspace{.15in}
+
+The function call takes the following form:
+
+```{r eval=FALSE}
+dove2(formula, data, plots = TRUE, changePts = NULL, 
+      constantVE = FALSE, timePts = NULL)
+```
+where \texttt{formula}, \texttt{data}, \texttt{plots}, and \texttt{timePts} are
+as described above for \textit{dove()}. Input \texttt{changePts} is an 
+optional numerical vector 
+to specify the change points, in units of days, of the piece-wise log-linear 
+hazard ratio for the vaccine effect. If no change points are provided,
+one change point will automatically be selected among Weeks 4, 5, 6, 7, 8 by 
+the Akaike information criterion (AIC).
+Input \texttt{constantVE} is a logical 
+object indicating the VE trend after the last change point. 
+If specified as TRUE, VE is assumed to be constant in the 
+period after the last change point; otherwise it is allowed to
+vary after the last change point. 
+If \texttt{timePts} is not specified, the default sequence of the 
+multiples of the first change point
+will be used. 
+
+\vspace{.15in}
+
+The model statement is as previously described for \textit{dove()}. Specifically, the
+\texttt{formula} input takes the following general structure
+
+```{r eval=FALSE}
+Surv(event_time, event_status) ~ covariates + 
+        vaccine(entry_time, vaccination_statue, vaccination_time)
+```
+
+\vspace{.15in}
+
+To ensure stability, we suggest placing change points at the time points 
+where the events are relatively frequent
+and not placing change points near the right tail. We estimate $VE_a(t)$ and $VE_h(t)$
+up to the maximum of all observed event times.
+
+\vspace{.15in}
+
+
+### \textit{plot()}
+
+When provided a value object of class DOVE (the object returned by \textit{dove()} and
+\textit{dove2()}), this convenience function creates/recreates plots of the estimated VE 
+in reducing the attack rate, $VE_a(t)$, and in reducing the hazard rate, $VE_h(t)$.
+
+### \textit{print()}
+
+When provided a value object of class DOVE (the object returned by \textit{dove()} and
+\textit{dove2()}), the tabular results are displayed.
+
+\section{Examples}
+
+We use the dataset provided with the package, doveData, to illustrate
+the analyses. 
+This dataset was simulated under a priority-tier dependent 
+crossover design with a ramping vaccine effect between dose 1 and dose 2 and 
+contains the following observations for each of the 40,000 
+participants:
+
+\begin{itemize}
+\item \textbf{entry.time}: The entry time in days.
+\item \textbf{event.time}: The event time in days.
+\item \textbf{event.status}: The event indicator (1=observed; 0=censored).
+\item \textbf{vaccine.time}: The time of vaccination in days; NA if not vaccinated.
+\item \textbf{vaccine.status}: The indicator of vaccination (1=vaccinated; 0 = not vaccinated).
+\item \textbf{priority}: A composite baseline risk score taking values 1-5.
+\item \textbf{sex}: A binary indicator of sex (male/female).
+\end{itemize}
+
+\vspace{.15in}
+  
+    
+The data can be loaded in the usual way
+```{r}
+data(doveData)
+```
+
+```{r}
+head(doveData)
+```
+
+\vspace{.15in}
+
+The summary statistics are shown below
+```{r}
+summary(doveData)
+```
+We see that participants were enrolled in the 
+study over a 4-month period (0 $\le$ entry.time $\le 120$ days), the 
+follow-up ended on day 320 (event.time $\le$ 320 days) with a $\sim 6.7\%$ event rate, 
+and $\sim 92\%$ of the participants were vaccinated over the course of 
+the study period. In addition, 
+the priority (risk) score is evenly distributed across participants, who are 
+equally distributed between the two sex groups.
+
+\subsection{ \textit{dove()} }
+
+First, we illustrate a \textit{dove()} analysis. 
+Here, we will include in our model statement baseline 
+covariates, priority and sex. In addition, we will use the default partitioning
+of the study period and the default tuning parameter for the bandwidth.
+The function call takes the following form
+
+```{r fig.show='hide', echo=TRUE, eval=FALSE}
+result1 <- dove(formula = Surv(event.time, event.status) ~ priority + sex + 
+                          vaccine(entry.time, vaccine.status, vaccine.time), 
+                data = doveData)
+```
+```{r echo = FALSE}
+result1 <- readRDS(file = "doveResult.rds")
+```
+\begin{verbatim}
+## tau = 320
+
+## timePts not given; default values will be used
+
+## method converged after 13 iterations
+\end{verbatim}
+\vspace{.15in}
+
+
+The function returns an object of class DOVE containing a list with the following elements. For 
+brevity, we show only a snapshot of the large tabular results.
+
+\noindent \textbf{call}: The unevaluated call.
+
+\vspace{.1in}
+
+\noindent \textbf{Covariate Effects}: The estimated hazard ratio for each 
+covariate, together with the (estimated) standard error, the $95\%$ confidence 
+interval, and the two-sided p-value for testing no covariate effect.
+      
+```{r}
+result1$covariates
+```
+
+\vspace{.15in}
+ 
+
+      
+\noindent \textbf{Vaccine Efficacy}: Element \textbf{\$efficacy} contains the 
+estimated VE in reducing 
+the attack rate at each observed event time, together 
+with its standard error and the $95\%$ confidence interval. In addition, the 
+raw estimate of the hazard ratio at each observed event time is provided.
+      
+```{r}
+head(result1$vaccine$efficacy)
+tail(result1$vaccine$efficacy)
+```
+
+Element \textbf{\$period\_efficacy} contains the estimated VE in 
+reducing the attack rate over each time period, 
+its standard error, and the $95\%$ confidence interval.
+    
+```{r}
+result1$vaccine$period_efficacy
+```
+
+\vspace{.15in}
+
+
+The graphical depictions of estimates returned in \textbf{vaccine\$efficacy} are 
+generated by default by \textit{dove()} and are shown in Figure \ref{fig:doveFigs}.
+This figure can be regenerated using \textit{plot()} as follows:
+
+```{r eval=FALSE}
+plot(x = result1)
+```
+
+```{r, echo=FALSE, out.width='49%', fig.cap='\\label{fig:doveFigs}Plots auto-generated by \\textit{dove()}. On the left, the estimated VE curve in reducing the attack rate, $VE_a(t)$ (black) and its $95\\%$ confidence intervals (green) are shown as a function of the time since vaccination. On the right, the estimated VE curve in reducing the hazard ratio, $VE_h(t)$, is shown as a function of the time since vaccination.', fig.show='hold', fig.align='center'}
+knitr::include_graphics(
+  path=c("dove1a.pdf","dove1b.pdf"),
+  auto_pdf = getOption("knitr.graphics.auto_pdf", FALSE),
+  dpi = NULL,
+  error = getOption("knitr.graphics.error", TRUE)
+)
+```
+
+\subsection{\textit{dove2()}}
+
+
+In the first analysis illustrating \textit{dove2()}, 
+we set Week 4 as the change point and assume a potentially 
+waning VE after 4 weeks. We estimate $VE_a$ over 0-4, 4-16, 16-28, 28-40 weeks. 
+Note that all times must be provided in the unit of days. The function call takes the following form
+
+```{r fig.show='hide', echo=TRUE}
+result2 <- dove2(formula = Surv(event.time, event.status) ~ priority + sex + 
+                           vaccine(entry.time, vaccine.status, vaccine.time), 
+                 data = doveData,
+                 changePts = 4*7,
+                 timePts = c(4, 16, 28, 40)*7)
+```
+
+
+\vspace{.15in}
+
+The function returns an S3 object of class DOVE, which contains a list 
+object with the following information.
+
+\vspace{.1in}
+
+\noindent \textbf{call}: The unevaluated call.
+
+```{r}
+result2$call
+```
+\vspace{.15in}
+
+\noindent \textbf{changePts}: The changePts of the analysis.
+
+```{r}
+result2$changePts
+```
+
+\vspace{.15in}
+
+\noindent \textbf{Covariate Effects}: The estimated (log) hazard ratio of each covariate, 
+together with the estimated standard error, the $95\%$ confidence 
+interval, and the two-sided p-value for testing no covariate effect. 
+
+```{r}
+result2$covariates
+```
+
+When no baseline covariates are provided, this element will be NA.
+
+\vspace{.15in}
+
+
+\noindent \textbf{Vaccine Efficacy}: Element \textbf{\$VE\_a} contains the 
+daily VE estimate in reducing the attack rate, together 
+with its standard error and the $95\%$ confidence interval. 
+Element \textbf{\$VE\_h} contains the daily VE estimate in reducing 
+the hazard rate, together 
+with its standard error and the $95\%$ confidence interval. 
+
+```{r}
+head(result2$vaccine$VE_a)
+tail(result2$vaccine$VE_a)
+head(result2$vaccine$VE_h)
+tail(result2$vaccine$VE_h)
+```
+
+Element \textbf{\$VE\_period} contains the estimated VE in 
+reducing the attack rate over each time period, 
+its standard error, and the $95\%$ confidence interval.
+
+```{r}
+result2$vaccine$VE_period
+```
+
+\vspace{.15in}
+
+
+
+The graphical depictions of $VE_a$ and $VE_h$ estimates are 
+generated by default by \textit{dove2()} and are shown in 
+Figure \ref{fig:dove2Figs}. This figure can be regenerated using 
+\textit{plot()} as follows:
+  
+```{r fig.show='hide', eval=FALSE}
+plot(x = result2)
+```
+
+```{r, fig.cap='\\label{fig:dove2Figs}Plots auto-generated by \\textit{dove2()}. On the left, the estimated VE curve in reducing the attack rate, $VE_a(t)$ (black) and its $95\\%$ confidence intervals (green) are shown as a function of the time since vaccination. On the right, the estimated VE curve in reducing the hazard ratio, $VE_h(t)$ (black) and its $95\\%$ confidence intervals (green) are shown as a function of the time since vaccination.', fig.show="hold", out.width="50%", echo=FALSE}
+knitr::include_graphics(
+  path=c("dove2a.pdf","dove2b.pdf"),
+  auto_pdf = getOption("knitr.graphics.auto_pdf", FALSE),
+  dpi = NULL,
+  error = getOption("knitr.graphics.error", TRUE)
+)
+```
+\vspace{.15in}
+
+In the final analysis, we have the software use AIC to choose a change point 
+among Weeks 4, 5, 6, 7, 8. 
+We assume a constant VE after the change point, and thus only the constant VE 
+is estimated. The function call takes the following form
+
+```{r echo=TRUE}
+result3 <- dove2(formula = Surv(event.time, event.status) ~ priority + sex + 
+                           vaccine(entry.time, vaccine.status, vaccine.time), 
+                 data = doveData,
+                 constantVE = TRUE)
+```
+
+
+
+\vspace{.15in}
+
+
+The function returns a list object containing the following items. 
+
+\vspace{.1in}
+
+\noindent \textbf{changePts}: The change point selected.
+
+```{r}
+result3$changePts
+```
+
+\vspace{.15in}
+
+
+\noindent \textbf{Covariate Effects}: The estimated (log) hazard ratio of each covariate, 
+together with the estimated standard error, the $95\%$ confidence 
+interval, and the two-sided p-value for testing no covariate effect.
+
+```{r}
+result3$covariates
+```
+
+\vspace{.15in}
+
+
+
+\noindent \textbf{Vaccine Efficacy}: Element \textbf{\$VE} contains the 
+estimated constant VE, together 
+with its standard error and the $95\%$ confidence interval. 
+
+
+```{r}
+result3$vaccine$VE
+```
+
+Plots cannot be generated when \texttt{constantVE} = TRUE.
+
+```{r}
+plot(x = result3)
+```
+
+
+\section{References}
+
+Lin DY,  Zeng D, Gilbert PB (2021a). 
+Evaluating the long-term efficacy of COVID-19 vaccines. 
+Clinical Infectious Diseases, ciab226, 
+https://doi.org/10.1093/cid/ciab226
+
+Lin, D-Y, Gu, Y., Zeng, D., Janes, H. E., and Gilbert, P. B. (2021b). 
+Evaluating Vaccine Efficacy Against SARS-CoV-2 Infection.
+Clinical Infectious Diseases, ciab630, https://doi.org/10.1093/cid/ciab630
+

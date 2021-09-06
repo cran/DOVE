@@ -1,3 +1,14 @@
+DOVE v1.7 (Release date: 2021-08-02)
+==============
+
+Changes:
+
+* Changes to documentation regarding categorical covariates in model for dove()
+* Incorporation of dove2() method and its updates to documentation
+* Modifications to kernel smoothing method for dove() to impose constraint
+  VE_a(0) = 0 and HR(0) = 1
+* Changed example dataset and updated documentation to reflect this change
+
 DOVE v1.6 (Release date: 2021-06-02)
 ==============
 
