@@ -1,7 +1,7 @@
 #include <cmath>
 #include <algorithm>
 bool eq(double a, double b) {
-    double diff = abs(a - b);
+    double diff = std::abs(a - b);
 
     if (diff <= 1e-12)
         return true;

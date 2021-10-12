@@ -1,6 +1,6 @@
-f36d7d4a887c2c29391b30f5764c014d *DESCRIPTION
+43c48d36f9cde6d9ac209b989be5e7f7 *DESCRIPTION
 d2c3ced799f71295e01d56fd9c512ba9 *NAMESPACE
-15e2554dada329f97784d5edde7a82df *NEWS
+a3ab679ba3c3f2272b701a886f93116b *NEWS
 eedda2ce2489750342c89dd9a6d4ef1a *R/CoxReg.R
 51c78b57dfe0bb91ceb56b962cd54be1 *R/RcppExports.R
 946315880e6f63371a1fc7109ddd7980 *R/VEcal.R
@@ -24,10 +24,10 @@ b67ac230e8455e6fa5bb9262edc89091 *R/postProcess.R
 89f8e0743f14095f0a20469125ec84c8 *R/vcFit.R
 6160ddbc36d7cffc8cb0a698c138b57f *R/verifyInputs.R
 7f38180a179a2e9682edaff156fab2ee *build/vignette.rds
-b490c116da6e7b95559ea8cfb9c9a341 *data/doveData.RData
+695c3ce641b682c2ce2d1b3a3b52f08a *data/doveData.RData
 ac82a1406a0a6d3220aee4cd1f3d5d99 *inst/doc/dove-vignette.R
 f4689b9299fbab0f0e6d1791c355bdb0 *inst/doc/dove-vignette.Rmd
-49ee962c8806811d7d2883e5a4a54cd6 *inst/doc/dove-vignette.pdf
+e6670552158a55a3bf4a7080b92be601 *inst/doc/dove-vignette.pdf
 cf249669f37c200d669c4c532863c642 *man/dove.Rd
 a6fe0c9fe27d8332d2d3ae2c89ad6db4 *man/dove2.Rd
 eb9494a71cc5a737b051436f53e1eaf2 *man/doveData.Rd
@@ -41,7 +41,7 @@ eb9494a71cc5a737b051436f53e1eaf2 *man/doveData.Rd
 61059660eb073d93e00e8ee054237071 *src/Makevars
 61059660eb073d93e00e8ee054237071 *src/Makevars.win
 5b9a38a16b0b457f46d4700d96764eab *src/RcppExports.cpp
-301c91822701f6e41c6b98a9b3ff2c21 *src/compare.cpp
+986c4e17d12c0a86999d45da5c4ef911 *src/compare.cpp
 591272c96e334559a1352ec61307c5f3 *src/compare.h
 6014465bbbeb9845b1d9b9794cc07bbd *src/iteration.cpp
 f4689b9299fbab0f0e6d1791c355bdb0 *vignettes/dove-vignette.Rmd
