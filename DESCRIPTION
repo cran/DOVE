@@ -1,13 +1,13 @@
 Package: DOVE
 Type: Package
 Title: Durability of Vaccine Efficacy
-Version: 1.8
-Date: 2021-10-12
+Version: 1.9
+Date: 2022-06-05
 Authors@R: c(person("Danyu", "Lin", role = "aut"),
              person("Yu", "Gu", role = "aut"),
              person("Donglin", "Zeng", role = "aut"),
-             person("Shannon", "Holloway", role = c("aut", "cre"),
-                     email = "sthollow@ncsu.edu"))
+             person("Shannon T.", "Holloway", role = c("aut", "cre"),
+                     email = "shannon.t.holloway@gmail.com"))
 Description: Implements maximum likelihood methods for 
     evaluating the durability of vaccine efficacy in a randomized, 
     placebo-controlled clinical trial with staggered enrollment of participants 
@@ -35,7 +35,7 @@ Collate: 'VEplot_type2.R' 'VEcal.R' 'postProcess.R' 'CoxReg.R'
 Author: Danyu Lin [aut],
   Yu Gu [aut],
   Donglin Zeng [aut],
-  Shannon Holloway [aut, cre]
-Maintainer: Shannon Holloway <sthollow@ncsu.edu>
-Packaged: 2021-10-12 13:54:08 UTC; sthollow
-Date/Publication: 2021-10-12 14:20:02 UTC
+  Shannon T. Holloway [aut, cre]
+Maintainer: Shannon T. Holloway <shannon.t.holloway@gmail.com>
+Packaged: 2022-06-05 17:46:33 UTC; 19194
+Date/Publication: 2022-06-07 12:00:25 UTC
