@@ -28,6 +28,9 @@ Generates plots of the estimated vaccine efficacy in reducing attack rate,
   and their 95\% confidence intervals.
 }
 \examples{
+\dontshow{
+  RcppArmadillo::armadillo_throttle_cores(2)
+}
 data(doveData)
 
 set.seed(1234)

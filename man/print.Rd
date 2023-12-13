@@ -20,6 +20,9 @@ No return value, called to display key results.
 Print the primary results of a dove() or dove2() analysis.
 }
 \examples{
+\dontshow{
+  RcppArmadillo::armadillo_throttle_cores(2)
+}
 data(doveData)
 
 set.seed(1234)

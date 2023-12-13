@@ -135,6 +135,9 @@ If categorical covariates are provided, all other categories are compared to the
 A model without covariates is also allowed.
 }
 \examples{
+\dontshow{
+  RcppArmadillo::armadillo_throttle_cores(2)
+}
 data(doveData)
 
 set.seed(1234)

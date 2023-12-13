@@ -1,8 +1,8 @@
 Package: DOVE
 Type: Package
 Title: Durability of Vaccine Efficacy
-Version: 1.9
-Date: 2022-06-05
+Version: 1.10
+Date: 2023-12-13
 Authors@R: c(person("Danyu", "Lin", role = "aut"),
              person("Yu", "Gu", role = "aut"),
              person("Donglin", "Zeng", role = "aut"),
@@ -20,13 +20,13 @@ Description: Implements maximum likelihood methods for
 License: GPL-2
 Depends: R (>= 3.5.0), methods, survival
 Suggests: rmarkdown, knitr
-Imports: Rcpp (>= 1.0.4.6), stats, graphics
+Imports: Rcpp (>= 1.0.4.6), stats, graphics, RcppArmadillo
 VignetteBuilder: utils, knitr
 LinkingTo: Rcpp, RcppArmadillo
 NeedsCompilation: yes
 Repository: CRAN
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Collate: 'VEplot_type2.R' 'VEcal.R' 'postProcess.R' 'CoxReg.R'
         'RcppExports.R' 'VEplot_type1.R' 'postInterval.R' 'postBeta.R'
         'infBeta.R' 'postProcessDove.R' 'scores.R' 'loc.R' 'vcFit.R'
@@ -37,5 +37,5 @@ Author: Danyu Lin [aut],
   Donglin Zeng [aut],
   Shannon T. Holloway [aut, cre]
 Maintainer: Shannon T. Holloway <shannon.t.holloway@gmail.com>
-Packaged: 2022-06-05 17:46:33 UTC; 19194
-Date/Publication: 2022-06-07 12:00:25 UTC
+Packaged: 2023-12-13 23:04:21 UTC; 19194
+Date/Publication: 2023-12-13 23:40:05 UTC

@@ -21,6 +21,9 @@
 #' @returns No return value, called to produce graphical elements.
 #'
 #' @examples
+#' \dontshow{
+#'   RcppArmadillo::armadillo_throttle_cores(2)
+#' }
 #' data(doveData)
 #'
 #' set.seed(1234)

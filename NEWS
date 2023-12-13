@@ -1,3 +1,18 @@
+DOVE v1.10 Release date: 2023-12-13)
+==============
+
+Changes:
+
+* Remove C++11 flag
+* Throttle threads in examples and vignette
+
+DOVE v1.9 (Release date: 2022-06-05)
+==============
+
+Changes:
+
+* Change to maintainer address
+
 DOVE v1.8 (Release date: 2021-10-12)
 ==============
 

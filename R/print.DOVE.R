@@ -13,6 +13,9 @@
 #' @returns No return value, called to display key results.
 #'
 #' @examples
+#' \dontshow{
+#'   RcppArmadillo::armadillo_throttle_cores(2)
+#' }
 #' data(doveData)
 #'
 #' set.seed(1234)

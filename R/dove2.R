@@ -132,6 +132,9 @@
 #' @include verifyInputs.R CoxReg.R 
 #' 
 #' @examples
+#' \dontshow{
+#'   RcppArmadillo::armadillo_throttle_cores(2)
+#' }
 #' data(doveData)
 #'
 #' set.seed(1234)

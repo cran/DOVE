@@ -117,11 +117,14 @@
 #'
 #' @export
 #' @import methods
+#' @importFrom RcppArmadillo armadillo_throttle_cores
 #' 
 #' @include verifyInputs.R vcFit.R
 #'
 #' @examples
-#'
+#' \dontshow{
+#'   RcppArmadillo::armadillo_throttle_cores(2)
+#' }
 #' data(doveData)
 #'
 #' set.seed(1234)

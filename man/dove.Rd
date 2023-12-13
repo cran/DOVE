@@ -119,7 +119,9 @@ vaccination_time > event_time, or vaccination_time < entry_time, the
 case will be removed from the analysis and a message will be generated.
 }
 \examples{
-
+\dontshow{
+  RcppArmadillo::armadillo_throttle_cores(2)
+}
 data(doveData)
 
 set.seed(1234)
